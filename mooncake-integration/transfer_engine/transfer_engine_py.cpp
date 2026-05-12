@@ -993,6 +993,11 @@ std::vector<TransferEnginePy::TransferNotify> TransferEnginePy::getNotifies() {
     return result;
 }
 
+int TransferEnginePy::sendProbe(const std::string &peer_server_name) {
+    if (!engine_) return -1;
+    return engine_->getMetadata()->sendProbe(peer_server_name);
+}
+
 namespace py = pybind11;
 
 // Implementation of coro_rpc_interface binding function
@@ -1087,6 +1092,11 @@ PYBIND11_MODULE(engine, m) {
             .def("get_first_buffer_address",
                  &TransferEnginePy::getFirstBufferAddress)
             .def("get_notifies", &TransferEnginePy::getNotifies)
+            .def("send_probe", &TransferEnginePy::sendProbe,
+                 py::arg("peer_server_name"),
+                 "Send a JSON-RPC probe to peer to verify reachability. "
+                 "Returns 0 on success, non-zero on failure. Used by "
+                 "SGLang's failed-session blacklist recovery.")
             .def("get_engine", &TransferEnginePy::getEngine)
             .def("get_engine_ptr", &TransferEnginePy::getEnginePtr);
 
